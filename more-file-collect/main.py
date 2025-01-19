@@ -37,6 +37,21 @@ class copy(tk.Frame):
         print("完成")
 
     # 递归检查文件夹并复制文件
+    # 递归复制一个目录树。
+
+    # Args:
+    #     src (str): 源目录路径。
+    #     dst (str): 目标目录路径。
+    #     axios (str): 指定的分隔符。
+    #     symlinks (bool): 是否处理符号链接。默认为False。
+
+    # Returns:
+    #     None
+
+    # Raises:
+    #     OSError: 如果在复制过程中发生文件操作错误。
+    #     shutil.Error: 如果在复制过程中发生shutil模块相关错误。
+
     def copytree(self, src, dst, axios, symlinks=False):
         names = os.listdir(src)
         print(names)
@@ -49,9 +64,12 @@ class copy(tk.Frame):
                 if os.path.isdir(srcname):
                     self.copytree(srcname, dst, axios, symlinks)
                 else:
-                    if srcname == srcname.split(axios)[0]:
-                        continue
-                    shutil.copy2(srcname, dstname)
+                    con = False
+                    for i in axios.split(","):
+                        if srcname.endswith(i):
+                            con = True
+                    if con == True:
+                        shutil.copy2(srcname, dstname)
             except OSError as why:
                 errors.append((srcname, dstname, str(why)))
             except shutil.Error as err:
