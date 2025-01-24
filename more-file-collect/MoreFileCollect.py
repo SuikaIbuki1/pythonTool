@@ -1,5 +1,4 @@
 import tkinter as tk
-from pathlib import Path
 import os
 import shutil
 
@@ -52,28 +51,26 @@ class copy(tk.Frame):
     #     OSError: 如果在复制过程中发生文件操作错误。
     #     shutil.Error: 如果在复制过程中发生shutil模块相关错误。
 
-    def copytree(self, src, dst, axios, symlinks=False):
-        names = os.listdir(src)
-        print(names)
-        # os.makedirs(dst)
-        errors = []
-        for name in names:
-            srcname = os.path.join(src, name)
-            dstname = os.path.join(dst, name)
-            try:
-                if os.path.isdir(srcname):
-                    self.copytree(srcname, dst, axios, symlinks)
-                else:
-                    con = False
-                    for i in axios.split(","):
-                        if srcname.endswith(i):
-                            con = True
-                    if con == True:
-                        shutil.copy2(srcname, dstname)
-            except OSError as why:
-                errors.append((srcname, dstname, str(why)))
-            except shutil.Error as err:
-                errors.extend(err.args[0])
+def copytree(self, src, dst, axios, symlinks=False):
+    os.makedirs(dst, exist_ok=True)  # 确保目标目录存在
+    names = os.listdir(src)
+    errors = []
+    for name in names:
+        srcname = os.path.join(src, name)
+        dstname = os.path.join(dst, name)
+        try:
+            if os.path.isdir(srcname):
+                self.copytree(srcname, dstname, axios, symlinks)  # 修正递归调用
+            else:
+                con = False
+                for i in axios.split(","):
+                    if srcname.endswith(i):
+                        con = True
+                        break  # 可以提前退出循环
+                if con:
+                    shutil.copy2(srcname, dstname)
+        except Exception as err:
+            errors.append((srcname, dstname, str(err)))
 
 windows = copy()
 windows.master.title("文件复制")
